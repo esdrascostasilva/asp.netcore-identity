@@ -1,4 +1,5 @@
-﻿using AspNetCoreIdentity.Models;
+﻿using AspNetCoreIdentity.Extensions;
+using AspNetCoreIdentity.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -41,12 +42,11 @@ namespace AspNetCoreIdentity.Controllers
             return View("Secret");
         }
 
-        [Authorize(Policy = "CanWrite")]
+        [ClaimsAuthorizeAttribute("Products", "Read")]
         public IActionResult ClaimsCustom()
         {
             return View("Secret");
         }
-
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
