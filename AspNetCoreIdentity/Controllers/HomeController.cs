@@ -21,6 +21,8 @@ namespace AspNetCoreIdentity.Controllers
         
         public IActionResult Privacy()
         {
+            throw new Exception("Error");
+            
             return View();
         }
 
@@ -48,11 +50,37 @@ namespace AspNetCoreIdentity.Controllers
             return View("Secret");
         }
 
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [Route("error/{id:length(3,3)}")]
+        public IActionResult Error(int id)
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var modelError = new ErrorViewModel();
+
+            if (id == 500)
+            {
+                modelError.Message = "Occurred an error! Try again later or contact our suport.";
+                modelError.Title = "Occured an error!";
+                modelError.ErrorCode = id;
+            }
+
+            else if (id == 404)
+            {
+                modelError.Message = "The page that you search not exist! <br />In case doubt contact our support.";
+                modelError.Title = "Ops! Page not found.";
+                modelError.ErrorCode = id;
+            }
+
+            else if (id == 403)
+            {
+                modelError.Message = "You haven't permission for to do it.";
+                modelError.Title = "Access denied.";
+                modelError.ErrorCode = id;
+            }
+            else
+            {
+                return StatusCode(404);
+            }
+
+            return View("Error", modelError);
         }
     }
 }
