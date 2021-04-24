@@ -1,21 +1,27 @@
 ﻿using AspNetCoreIdentity.Extensions;
 using AspNetCoreIdentity.Models;
+using KissLog;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AspNetCoreIdentity.Controllers
 {
     [Authorize]
     public class HomeController : Controller
     {
+        private readonly ILogger _logger;
+
+        public HomeController(ILogger logger)
+        {
+            _logger = logger;
+        }
+
         [AllowAnonymous]
         public IActionResult Index()
         {
+            _logger.Trace("The user access Home Page. Congragulations, your Log is works :)");
+
             return View();
         }
         
@@ -29,6 +35,16 @@ namespace AspNetCoreIdentity.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Secret()
         {
+            try
+            {
+                throw new Exception("Ops, occured an error =(");
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+                throw;
+            }
+
             return View();
         }
 
