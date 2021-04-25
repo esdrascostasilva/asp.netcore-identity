@@ -1,5 +1,4 @@
 ﻿using AspNetCoreIdentity.Config;
-using KissLog;
 using KissLog.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,12 +6,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using KissLog.CloudListeners.Auth;
-using KissLog.CloudListeners.RequestLogsListener;
+using AspNetCoreIdentity.Extensions;
 using System;
 using System.Text;
 using System.Diagnostics;
-using AspNetCoreIdentity.Extensions;
+using KissLog.CloudListeners.RequestLogsListener;
+using KissLog.CloudListeners.Auth;
 
 namespace AspNetCoreIdentity
 {
@@ -40,21 +39,11 @@ namespace AspNetCoreIdentity
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddScoped<ILogger>((context) =>
-            {
-                return Logger.Factory.Get();
-            });
-
-            services.AddLogging(logging =>
-            {
-                logging.AddKissLog();
-            });
-
-            services.AddSession();
-
+            
             services.AddIdentityConfig(Configuration);
             services.AddAuthorizationConfig();
             services.ResolveDependencies();
+            services.AddSession();
             services.AddMvc(options =>
             {
                 options.Filters.Add(typeof(AuditFilter));
@@ -76,7 +65,8 @@ namespace AspNetCoreIdentity
 
             app.UseKissLogMiddleware();
 
-            app.UseKissLogMiddleware(options => {
+            app.UseKissLogMiddleware(options =>
+            {
                 ConfigureKissLog(options);
             });
 
@@ -90,7 +80,6 @@ namespace AspNetCoreIdentity
                 routes.MapRoute("default","{controller=Home}/{action=Index}/{id?}");
             });
 
-            //LogConfig.RegisterKissLogListeners(Configuration);
         }
 
 
@@ -125,11 +114,11 @@ namespace AspNetCoreIdentity
 
             // register KissLog.net cloud listener
             options.Listeners.Add(new RequestLogsApiListener(new Application(
-                Configuration["KissLog.OrganizationId"],    //  "045c0a67-31db-43e7-800e-35e5872affce"
-                Configuration["KissLog.ApplicationId"])     //  "838d2e0e-7942-436c-bcf2-c5d630d0cda1"
+                Configuration["KissLog.OrganizationId"],
+                Configuration["KissLog.ApplicationId"])
             )
             {
-                ApiUrl = Configuration["KissLog.ApiUrl"]    //  "https://api.kisslog.net"
+                ApiUrl = Configuration["KissLog.ApiUrl"]
             });
         }
 
